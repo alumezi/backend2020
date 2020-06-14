@@ -32,9 +32,12 @@ const phonebook = [
 ];
 
 app.get("/", (request, response) => {
-    response.send(
-        "Go to /api/persons for phonebook"
-    );
+    response.status(200).send(
+        "Go to /api/persons for phonebook \nGo to /info for info");
+});
+
+app.get("/info", (request, response) => {
+    response.status(200).send(`Phonebook has info for ${phonebook.length} people \n\n${new Date()}`);
 });
 
 app.get('/api/persons', (request, response) => {
