@@ -60,6 +60,25 @@ app.delete('/api/persons/:id', (request, response) => {
     response.status(204).end();
 });
 
+app.post('/api/persons', (request, response) => {
+    let resource = request.body;
+
+    if (!resource) {
+        return response.status(400).json({
+            error: "Resource missing"
+        });
+    }
+
+    let phonebookEntry = {
+        id: Math.floor(Math.random() * 100) * phonebook.length,
+        date: new Date(),
+        ...resource
+    }
+
+    phonebook = phonebook.concat(phonebookEntry);
+    response.json(phonebookEntry);
+});
+
 const PORT = 3001;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)

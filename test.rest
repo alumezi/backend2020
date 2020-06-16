@@ -1,17 +1,27 @@
-delete http://localhost:3001/api/persons/5
+DELETE  http://localhost:3001/api/persons/5
 
 ###
 
-get http://localhost:3001/api/persons
+GET http://localhost:3001/api/persons
 
 ###
 
-get http://localhost:3001/api/persons/2
+GET http://localhost:3001/api/persons/2
 
 ###
 
-get http://localhost:3001/info
+GET http://localhost:3001/info
 
 ###
 
-get http://localhost:3001/
+GET http://localhost:3001/
+
+###
+
+POST http://localhost:3001/api/persons
+content-type: application/json
+
+{
+    "name": "Dan Abramov",
+    "number": "123-56489-756"
+}
