@@ -62,11 +62,30 @@ app.delete('/api/persons/:id', (request, response) => {
 
 app.post('/api/persons', (request, response) => {
     let resource = request.body;
+    console.log("resource", resource)
 
-    if (!resource) {
+    if (!resource.name && !resource.number) {
         return response.status(400).json({
-            error: "Resource missing"
+            error: "Body missing"
         });
+    }
+
+    if (!resource.name) {
+        return response.status(400).json({
+            error: "Name missing"
+        })
+    }
+
+    if (!resource.number) {
+        return response.status(400).json({
+            error: "Number missing"
+        })
+    }
+
+    if (phonebook.find(item => item.name === resource.name)) {
+        return response.status(409).json({
+            error: "Entry exists"
+        })
     }
 
     let phonebookEntry = {
