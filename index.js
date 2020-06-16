@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 
-const phonebook = [
+let phonebook = [
 
     {
         "name": "Arto Hellas",
@@ -41,7 +41,6 @@ app.get("/info", (request, response) => {
 });
 
 app.get('/api/persons', (request, response) => {
-    console.log(request)
     response.json(phonebook);
 });
 
@@ -53,6 +52,12 @@ app.get('/api/persons/:id', (request, response) => {
     } else {
         response.status(404).end();
     }
+});
+
+app.delete('/api/persons/:id', (request, response) => {
+    let id = Number(request.params.id);
+    phonebook = phonebook.filter(item => item.id !== id);
+    response.status(204).end();
 });
 
 const PORT = 3001;
