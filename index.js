@@ -1,6 +1,22 @@
 const express = require('express');
+const morgan = require('morgan');
 const app = express();
 app.use(express.json());
+// app.use(morgan('tiny'));
+morgan.token('returnData', (request) => {
+    return request.body;
+});
+
+app.use(morgan((tokens, req, res) => {
+    return [
+        tokens.method(req, res),
+        tokens.url(req, res),
+        tokens.status(req, res),
+        tokens.res(req, res, 'content-length'), '-',
+        tokens['response-time'](req, res), 'ms',
+        JSON.stringify(tokens.returnData(req))
+    ].join(' ');
+}));
 
 let phonebook = [
 
@@ -62,7 +78,6 @@ app.delete('/api/persons/:id', (request, response) => {
 
 app.post('/api/persons', (request, response) => {
     let resource = request.body;
-    console.log("resource", resource)
 
     if (!resource.name && !resource.number) {
         return response.status(400).json({
