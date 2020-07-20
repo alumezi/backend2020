@@ -24,7 +24,7 @@ app.use(morgan((tokens, req, res) => {
 let phonebook = [
 
     {
-        "name": "Arto Hellas",
+        "name": "Arto Hs",
         "number": "123-456",
         "id": 1
     },
