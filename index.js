@@ -1,6 +1,8 @@
+require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
+const PhoneBook = require('./models/phonebook');
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -21,35 +23,6 @@ app.use(morgan((tokens, req, res) => {
     ].join(' ');
 }));
 
-let phonebook = [
-
-    {
-        "name": "Arto Hs",
-        "number": "123-456",
-        "id": 1
-    },
-    {
-        "name": "Ada Lovelace",
-        "number": "39-44-5323523",
-        "id": 2
-    },
-    {
-        "name": "Dan Abramov",
-        "number": "123-56489-756",
-        "id": 3
-    },
-    {
-        "name": "Mary Poppendieck",
-        "number": "39-23-6423111",
-        "id": 4
-    },
-    {
-        "name": "Arbnor Lumezi",
-        "number": "555-123-123",
-        "id": 5
-    }
-];
-
 app.get("/", (request, response) => {
     response.status(200).send(
         "Go to /api/persons for phonebook \nGo to /info for info");
@@ -60,24 +33,28 @@ app.get("/info", (request, response) => {
 });
 
 app.get('/api/persons', (request, response) => {
-    response.json(phonebook);
-});
-
-app.get('/api/persons/:id', (request, response) => {
-    let id = Number(request.params.id);
-    let resource = phonebook.find(item => item.id === id);
-    if (resource) {
-        response.json(resource);
-    } else {
-        response.status(404).end();
-    }
+    PhoneBook.find({}).then(res => {
+        response.json(res);
+    })
 });
 
 app.delete('/api/persons/:id', (request, response) => {
-    let id = Number(request.params.id);
-    phonebook = phonebook.filter(item => item.id !== id);
-    response.status(204).end();
+    PhoneBook.findByIdAndRemove(request.params.id, (err, res) => {
+        if (err) {
+            console.log(err)
+        } else {
+            response.status(204).end();
+        }
+    })
 });
+
+// app.put('/api/persons/:id', (request, response) => {
+//     let resource = request.body;
+//     let id = request.params.id;
+//     PhoneBook.findOneAndUpdate({ id, ...resource }).then(result => {
+//         response.status(204).end();
+//     })
+// })
 
 app.post('/api/persons', (request, response) => {
     let resource = request.body;
@@ -100,21 +77,56 @@ app.post('/api/persons', (request, response) => {
         })
     }
 
-    if (phonebook.find(item => item.name === resource.name)) {
-        return response.status(409).json({
-            error: "Entry exists"
-        })
-    }
+    PhoneBook.exists({ name: resource.name }).then(result => {
+        if (result) {
+            return response.status(409).json({
+                error: "Entry exists"
+            })
+        }
+    })
 
-    let phonebookEntry = {
-        id: Math.floor(Math.random() * 100) * phonebook.length,
+    const phonebookEntry = new PhoneBook({
         date: new Date(),
         ...resource
-    }
+    })
 
-    phonebook = phonebook.concat(phonebookEntry);
-    response.json(phonebookEntry);
+    phonebookEntry.save().then(savedEntry => {
+        response.json(savedEntry);
+    })
 });
+
+app.post('/api/seed', (request, response) => {
+    let phonebook = [
+        {
+            "name": "Arto Hs",
+            "number": "123-456"
+        },
+        {
+            "name": "Ada Lovelace",
+            "number": "39-44-5323523"
+        },
+        {
+            "name": "Dan Abramov",
+            "number": "123-56489-756"
+        },
+        {
+            "name": "Mary Poppendieck",
+            "number": "39-23-6423111"
+        },
+        {
+            "name": "Arbnor Lumezi",
+            "number": "555-123-123"
+        }
+    ];
+    PhoneBook.collection.insert(phonebook, (err, res) => {
+        if (err) {
+            console.log(err);
+            response.status(400);
+        } else {
+            response.status(200).send(`Database seeded`);
+        }
+    })
+})
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {

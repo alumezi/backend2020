@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 if (process.argv.length < 3) {
   console.log('Please provide the password as an argument: node mongo.js <password>')
@@ -18,12 +18,21 @@ const noteSchema = new mongoose.Schema({
   important: Boolean,
 })
 
+noteSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
+  }
+})
+
 const Note = mongoose.model('Note', noteSchema)
 
 if (process.argv.length === 3) {
   Note.find({}).then(result => {
     console.log("phonebook:")
     result.forEach(note => {
+      console.log("note", note)
       console.log(`${note.name} ${note.number}`)
     })
     mongoose.connection.close()
