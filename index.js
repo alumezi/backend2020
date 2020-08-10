@@ -29,6 +29,12 @@ app.get('/api/persons', (request, response, next) => {
     }).catch(err => next(err));
 });
 
+app.get('/api/persons/:id', (request, response, next) => {
+    PhoneBook.findById(request.params.id).then(res => {
+        response.json(res);
+    }).catch(err => next(err));
+});
+
 app.delete('/api/persons/:id', (request, response, next) => {
     PhoneBook.findByIdAndRemove(request.params.id).then(result => {
         response.status(204).end();
