@@ -23,23 +23,14 @@ app.use(morgan((tokens, req, res) => {
     ].join(' ');
 }));
 
-app.get("/", (request, response) => {
-    response.status(200).send(
-        "Go to /api/persons for phonebook \nGo to /info for info");
-});
-
-app.get("/info", (request, response) => {
-    response.status(200).send(`Phonebook has info for ${phonebook.length} people \n\n${new Date()}`);
-});
-
-app.get('/api/persons', (request, response) => {
+app.get('/api/persons', (request, response, next) => {
     PhoneBook.find({}).then(res => {
         response.json(res);
-    })
+    }).catch(err => next(err));
 });
 
-app.delete('/api/persons/:id', (request, response) => {
-    PhoneBook.findByIdAndRemove(request.params.id, (err, res) => {
+app.delete('/api/persons/:id', (request, response, next) => {
+    PhoneBook.findByIdAndRemove(request.params.id).then(result => {
         response.status(204).end();
     }).catch(err => next(err));
 });
@@ -116,13 +107,26 @@ app.post('/api/seed', (request, response) => {
     ];
     PhoneBook.collection.insert(phonebook, (err, res) => {
         if (err) {
-            console.log(err);
-            response.status(400);
+            response.status(400).end();
         } else {
             response.status(200).send(`Database seeded`);
         }
     })
 })
+
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+}
+
+const errorHandler = (error, request, response, next) => {
+    if (error.name === "CastError") {
+        return response.status(400).send({ error: 'malformatted id' });
+    }
+    next(error);
+}
+
+app.use(unknownEndpoint);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
