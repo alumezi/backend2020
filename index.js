@@ -23,6 +23,12 @@ app.use(morgan((tokens, req, res) => {
     ].join(' ');
 }));
 
+app.get("/info", (request, response) => {
+    PhoneBook.countDocuments({}).then(count => {
+        response.status(200).json({ info: `Phonebook has info for ${count} people ${new Date()}` });
+    })
+});
+
 app.get('/api/persons', (request, response, next) => {
     PhoneBook.find({}).then(res => {
         response.json(res);
