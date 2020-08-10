@@ -35,13 +35,13 @@ app.delete('/api/persons/:id', (request, response, next) => {
     }).catch(err => next(err));
 });
 
-// app.put('/api/persons/:id', (request, response) => {
-//     let resource = request.body;
-//     let id = request.params.id;
-//     PhoneBook.findOneAndUpdate({ id, ...resource }).then(result => {
-//         response.status(204).end();
-//     })
-// })
+app.put('/api/persons/:id', (request, response, next) => {
+    PhoneBook.findByIdAndUpdate(request.params.id, request.body, { new: true })
+        .then(updatedResource => {
+            response.json(updatedResource);
+        })
+        .catch(error => next(error))
+})
 
 app.post('/api/persons', (request, response) => {
     let resource = request.body;
