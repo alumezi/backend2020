@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
 mongoose.set('useFindAndModify', false);
-const url = `mongodb+srv://Arbnor:${process.env.DB_PASSWORD}@cluster0-nkcte.mongodb.net/note-app?retryWrites=true&w=majority`;
 
-mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(result => {
         console.log("result", result)
         console.log('connected to MongoDB')

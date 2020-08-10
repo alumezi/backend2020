@@ -40,12 +40,8 @@ app.get('/api/persons', (request, response) => {
 
 app.delete('/api/persons/:id', (request, response) => {
     PhoneBook.findByIdAndRemove(request.params.id, (err, res) => {
-        if (err) {
-            console.log(err)
-        } else {
-            response.status(204).end();
-        }
-    })
+        response.status(204).end();
+    }).catch(err => next(err));
 });
 
 // app.put('/api/persons/:id', (request, response) => {
