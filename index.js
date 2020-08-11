@@ -48,7 +48,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
 });
 
 app.put('/api/persons/:id', (request, response, next) => {
-    PhoneBook.findByIdAndUpdate(request.params.id, request.body, { new: true, runValidators: true })
+    PhoneBook.findByIdAndUpdate(request.params.id, { number: request.body.number }, { new: true, runValidators: true })
         .then(updatedResource => {
             response.json(updatedResource);
         })
