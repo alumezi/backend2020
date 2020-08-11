@@ -55,7 +55,7 @@ app.put('/api/persons/:id', (request, response, next) => {
         .catch(error => next(error))
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     let resource = request.body;
 
     if (!resource.name && !resource.number) {
@@ -76,14 +76,6 @@ app.post('/api/persons', (request, response) => {
         })
     }
 
-    PhoneBook.exists({ name: resource.name }).then(result => {
-        if (result) {
-            return response.status(409).json({
-                error: "Entry exists"
-            })
-        }
-    })
-
     const phonebookEntry = new PhoneBook({
         date: new Date(),
         ...resource
@@ -91,7 +83,7 @@ app.post('/api/persons', (request, response) => {
 
     phonebookEntry.save().then(savedEntry => {
         response.json(savedEntry);
-    })
+    }).catch(error => next(error))
 });
 
 app.post('/api/seed', (request, response) => {
@@ -133,6 +125,8 @@ const unknownEndpoint = (request, response) => {
 const errorHandler = (error, request, response, next) => {
     if (error.name === "CastError") {
         return response.status(400).send({ error: 'malformatted id' });
+    } else if (error.name === "ValidationError") {
+        return response.status(400).send({ error: error.message });
     }
     next(error);
 }

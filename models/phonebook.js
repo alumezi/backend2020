@@ -13,8 +13,8 @@ mongoose.connect(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology
     })
 
 const phoneBookSchema = new mongoose.Schema({
-    name: String,
-    number: String
+    name: { type: String, required: true, unique: true },
+    number: { type: String, required: true }
 })
 
 phoneBookSchema.set('toJSON', {
