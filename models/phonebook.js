@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const uniqueValidator = require('mongoose-unique-validator');
+
 mongoose.set('useFindAndModify', false);
 
 mongoose.connect(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -22,5 +24,7 @@ phoneBookSchema.set('toJSON', {
         delete returnedObject.__v
     }
 })
+
+phoneBookSchema.plugin(uniqueValidator);
 
 module.exports = mongoose.model('phoneBook', phoneBookSchema);
